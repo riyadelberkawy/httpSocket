@@ -7,7 +7,7 @@ import java.io.IOException;
 
 public class Client {
     public static void main(String[] args) {
-        Client c = new Client();
+        new Client();
     }
 
     Client() {
@@ -27,14 +27,28 @@ public class Client {
             str = response.readUTF();
             System.out.println(str);
 
-            /// get server question
             str = response.readUTF();
-
-            //// Enter client request as string
-            System.out.print(str);
+            System.out.println(str);
+            
             str = scan.nextLine();
-            //// send request to server
             request.writeUTF(str);
+
+            str = response.readUTF();
+            System.out.println(str);
+            str = scan.nextLine();
+            request.writeUTF(str);
+
+            //// Create Request or disconnect Client loop
+            while (!str.equals("disconnect")) {
+                //// send input
+                str = response.readUTF();
+                System.out.println(str);
+                str = scan.nextLine();
+                request.writeUTF(str);
+
+         
+            }
+
             //// recive response from server
             str = response.readUTF();
             System.out.println(str);
