@@ -7,8 +7,11 @@ public class Server {
     public static void main(String[] args) {
         
         try {
+
             new Server();
+
         } catch (Exception ex) {
+
             System.out.println("[Server] Starting Error ===>>> " + ex);
 
         }
@@ -20,7 +23,8 @@ public class Server {
         while (true) {
             try {
 
-                Socket client = server.accept();
+                Socket client = server.accept(); /// Server is waiting for Cliet Connection
+
                 System.out.println("Cleint [" + (++num) + "] is connected");
                 
                 Thread thread = new Thread(new ThreadHanler(client, num));
@@ -32,6 +36,4 @@ public class Server {
         }
 
     }
-    /////// Override Methodes
-    /// code Here
 }

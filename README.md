@@ -1,14 +1,5 @@
-## Getting Started
+## Http Socket
 
-Welcome to the VS Code Java world. Here is a guideline to help you get started to write Java code in Visual Studio Code.
-
-## Folder Structure
-
-The workspace contains two folders by default, where:
-
-- `src`: the folder to maintain sources
-- `lib`: the folder to maintain dependencies
-
-## Dependency Management
-
-The `JAVA DEPENDENCIES` view allows you to manage your dependencies. More details can be found [here](https://github.com/microsoft/vscode-java-pack/blob/master/release-notes/v0.9.0.md#work-with-jar-files-directly).
+I created this socket for my college project for the `Computer Network Technology` course using Java
+This Socket provides a `GET` and `POST` method that allows you to post a file to the server and get another if it exists.
+The Socket deals with more clients if they are connected at the same time ==> `threads`

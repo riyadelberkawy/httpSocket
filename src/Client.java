@@ -27,25 +27,30 @@ public class Client {
             str = response.readUTF();
             System.out.println(str);
 
+            //// Login
             str = response.readUTF();
             System.out.println(str);
-            
+
             str = scan.nextLine();
             request.writeUTF(str);
 
+            //// First Question From Server
             str = response.readUTF();
             System.out.println(str);
+
             str = scan.nextLine();
             request.writeUTF(str);
 
-            //// Create Request or disconnect Client loop
+            //// Create Request Client loop
             while (!str.equals("disconnect")) {
-                //// send input
+
+                /// recive Response
                 str = response.readUTF();
                 System.out.println(str);
+                
+                /// Send Request
                 str = scan.nextLine();
                 request.writeUTF(str);
-
          
             }
 
@@ -53,6 +58,7 @@ public class Client {
             str = response.readUTF();
             System.out.println(str);
 
+            scan.close();
             ///// close all connections
             response.close();
             request.close();

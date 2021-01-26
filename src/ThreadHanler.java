@@ -12,21 +12,22 @@ import java.io.FileWriter;
 public class ThreadHanler implements Runnable {
     protected Socket clientSocket = null;
     protected int clientIndex = 0;
-    protected String okRespones;
-    protected String wrgResponse;
 
     public ThreadHanler(Socket clientSocket, int clientIndex) {
         this.clientSocket = clientSocket;
         this.clientIndex = clientIndex;
     }
 
-    //// GET request
+    //// GET request Method
     static String getRequest(String host, String dir) {
 
         System.out.println("Request received\nGET/"+dir+" HTTP/1.1\nHost: " + host);
+        
         try {
             File file = new File("static/"+host+"/"+dir);
+        
             if (file.exists()) {
+        
                 String res = "Request Accepted\nHTTP/1.1 200 OK\n";
                 res += "Date: "+ new Date().toString() + "\n";
                 res += "Content-type: text/html; charset=UTF-8\n";
@@ -34,18 +35,21 @@ public class ThreadHanler implements Runnable {
                 res += "Content-file:\n";
             
                 Scanner content = new Scanner(file);
+        
+                //// Read File Content 
                 while(content.hasNextLine()){
                     String str = content.nextLine();
-                    res += str+"\n";
+                    res += str + "\n";
                 }
+        
                 content.close();
             
                 return res;
               
             } else {
                 return "Request refuesd\nHTTP/1.1 404 NOt Found";
-              
             }
+
         } catch (IOException e) {
             System.out.println("An error occurred.");
             e.printStackTrace();
@@ -54,28 +58,37 @@ public class ThreadHanler implements Runnable {
       
     }    
 
-    /// POST request
+    /// POST request Method
     static Boolean postRequest(String host, String dir) {
+
         System.out.println("Request received\nPOST/"+dir+" HTTP/1.1\nHost: " + host);
+        
         try {
+        
             File file = new File(dir);
             File postedFile = new File("static/"+host+"/"+file.getName());
+        
             if (!postedFile.exists()) {
                 postedFile.getParentFile().mkdirs();
                 if(postedFile.createNewFile()){
                      ///// write contetn file into file that is on server
-                    FileWriter myWriter = new FileWriter(postedFile.getAbsoluteFile());
+                    FileWriter writer = new FileWriter(postedFile.getAbsoluteFile());
                     Scanner content = new Scanner(file);
+                    
+                    /// Write File content 
                     while(content.hasNextLine()){
                         String str = content.nextLine();
-                        myWriter.write(str+"\n");
+                        writer.write(str+"\n");
                     }
-                    myWriter.close();
+        
+                    writer.close();
                     content.close();
                 }
+
                 System.out.println("File created Successfully");
                 return true;
             } else {
+
                 System.out.println("File already exists.");
                 return false;
             }
@@ -84,37 +97,42 @@ public class ThreadHanler implements Runnable {
             e.printStackTrace();
             return false;
         }
-
       
     }    
 
     @Override
     public void run() {
         try {
+
             DataInputStream request = new DataInputStream(clientSocket.getInputStream());
             DataOutputStream response = new DataOutputStream(clientSocket.getOutputStream());
 
-            /////
+            ///// 
             String host;
             String dir;
+            String str;
 
+            ////// Hello message
             response.writeUTF("Hello Client you are connected now :)");
-            response.writeUTF("Enter HOST name: ");
+            ////// Login
+            response.writeUTF("Enter HOST Name: ");
             host = request.readUTF();
 
-            response.writeUTF("Do you Want Do request \n Yes ==>> Enter Any value \n No ==> disconnect");
-            String str = request.readUTF();
+            //// First Question to CLient
+            response.writeUTF("Do you Want Do request!?\n Yes ==>> Enter Any value \n No ==> disconnect");
+            str = request.readUTF();
 
-            //// Create Request or disconnect Client loop
+            //// Create Request loop
             while(!str.equals("disconnect")){
-                str = "";
+                
+
                 //// Write Request or return to Main Mnenu loop
                 while (!str.equals("exit")) {
+
                     //// recive Client input
                     response.writeUTF("Chose Request Type:\n 1 - GET\n 2 - POST \n 3 - exit");
                     str = request.readUTF();
                     
-
                     if(str.equals("GET") || str.equals("POST")) {
                         switch (str) {
                             case "GET":
@@ -142,7 +160,6 @@ public class ThreadHanler implements Runnable {
                         str = ""; 
                     }else if(str.equals("exit")){
                         break;
-
                     }
                 }
                 response.writeUTF("Do you Want Do request \n Yes ==>> Enter Any value \n No ==> disconnect");
