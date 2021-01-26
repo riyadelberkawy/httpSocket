@@ -18,15 +18,32 @@ public class ThreadHanler implements Runnable {
         this.clientIndex = clientIndex;
     }
 
-    //// GET request Method
-    static String getRequest(String host, String dir) {
+    //// The search function for a file in subfolders
+    public static File findFile(String dir, String fileName, String host) {
+        File f = new File(dir);
+        if (fileName.equalsIgnoreCase(f.getName())) return f;
+        if (f.isDirectory()) {
+            for (String aChild : f.list()) {
+                System.out.println(aChild);
+                File ff = findFile(dir + File.separator + aChild, fileName, host);
+                if (ff != null){
+                 System.out.println("Request received\nGET/"+ff.getParent()+"/"+ff.getName()+" HTTP/1.1\nHost: " + host);    
+                    return ff;
+                };
+            }
+        }
+        return null;
+    }
 
-        System.out.println("Request received\nGET/"+dir+" HTTP/1.1\nHost: " + host);
+    //// GET request Method
+    static String getRequest(String host, String fileName) {
+        
+        String dir = "static/"+host+"/";
         
         try {
-            File file = new File("static/"+host+"/"+dir);
-        
-            if (file.exists()) {
+            File file = findFile(dir, fileName, host);
+            
+            if (file != null) {
         
                 String res = "Request Accepted\nHTTP/1.1 200 OK\n";
                 res += "Date: "+ new Date().toString() + "\n";
