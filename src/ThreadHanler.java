@@ -1,4 +1,3 @@
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -8,6 +7,7 @@ import java.util.Scanner;
 
 import java.io.File;
 import java.io.FileWriter;
+
 
 public class ThreadHanler implements Runnable {
     protected Socket clientSocket = null;
@@ -20,16 +20,15 @@ public class ThreadHanler implements Runnable {
 
     //// The search function for a file in subfolders
     public static File findFile(String dir, String fileName, String host) {
-        File f = new File(dir);
-        if (fileName.equalsIgnoreCase(f.getName())) return f;
-        if (f.isDirectory()) {
-            for (String aChild : f.list()) {
-                System.out.println(aChild);
-                File ff = findFile(dir + File.separator + aChild, fileName, host);
-                if (ff != null){
-                 System.out.println("Request received\nGET/"+ff.getParent()+"/"+ff.getName()+" HTTP/1.1\nHost: " + host);    
-                    return ff;
-                };
+        File file = new File(dir);
+        if (fileName.equalsIgnoreCase(file.getName())) return file;
+        if (file.isDirectory()) {
+            for (String aChild : file.list()) {
+                File targetFile = findFile(dir + File.separator + aChild, fileName, host);
+                if (targetFile != null){
+                 System.out.println("\nRequest received\nGET/"+targetFile.getParent()+"/"+targetFile.getName()+" HTTP/1.1\nHost: " + host);    
+                    return targetFile;
+                }
             }
         }
         return null;
@@ -52,10 +51,10 @@ public class ThreadHanler implements Runnable {
                 res += "Content-file:\n";
             
                 Scanner content = new Scanner(file);
-        
+                String str ;
                 //// Read File Content 
                 while(content.hasNextLine()){
-                    String str = content.nextLine();
+                    str = content.nextLine();
                     res += str + "\n";
                 }
         
@@ -68,7 +67,7 @@ public class ThreadHanler implements Runnable {
             }
 
         } catch (IOException e) {
-            System.out.println("An error occurred.");
+            System.out.println("GET request Error");
             e.printStackTrace();
             return "Request refuesd\nHTTP/1.1 404 NOt Found";
         }
@@ -110,7 +109,7 @@ public class ThreadHanler implements Runnable {
                 return false;
             }
         } catch (IOException e) {
-            System.out.println("An error occurred.");
+            System.out.println("POST request Error");
             e.printStackTrace();
             return false;
         }
@@ -153,7 +152,7 @@ public class ThreadHanler implements Runnable {
                     if(str.equals("GET") || str.equals("POST")) {
                         switch (str) {
                             case "GET":
-                                response.writeUTF("Please Enter the Diraction of the required file: ");
+                                response.writeUTF("Please Enter the File Name: ");
                                 dir = request.readUTF();
                                 response.writeUTF(getRequest(host, dir) + "\n\nPress Enter to continue");
                                 request.readUTF();
@@ -189,6 +188,7 @@ public class ThreadHanler implements Runnable {
             clientSocket.close();
         } catch (IOException e) {
             // report exception somewhere.
+            System.out.println("run function Error");
             e.printStackTrace();
         }
 

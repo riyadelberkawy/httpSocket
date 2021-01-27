@@ -12,7 +12,7 @@ public class Server {
 
         } catch (Exception ex) {
 
-            System.out.println("[Server] Starting Error ===>>> " + ex);
+            System.out.println("[Server] Starting Error ===>>> \n" + ex);
 
         }
     }
