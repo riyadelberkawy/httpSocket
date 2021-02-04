@@ -1,19 +1,51 @@
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Scanner;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
 
 public class Client {
     public static void main(String[] args) {
         new Client();
     }
 
+
+
+    static String postRequest(String dir) {
+
+        
+        try {
+            File file = new File(dir);
+    
+            Scanner content = new Scanner(file);
+            String str;
+            String req = "";
+
+            req += file.getName() + "\n";
+            //// Read File Content 
+            
+            while(content.hasNextLine()){
+                str = content.nextLine();
+                req += str + "\n";
+            }
+            content.close();
+            return req;
+            
+        } catch (IOException e) {
+            System.out.println("POST request Error");
+            e.printStackTrace();
+            return "error";
+        }
+      
+    }    
+
+
     Client() {
         Scanner scan = new Scanner(System.in);
         try {
-            InetAddress ip = InetAddress.getLocalHost();
+            InetAddress ip = InetAddress.getLocalHost(); 
 
             // connect with server
             Socket socket = new Socket(ip, 5555);
@@ -44,6 +76,18 @@ public class Client {
             //// Create Request Client loop
             while (!str.equals("disconnect")) {
 
+                if(str.equals("POST")){
+                    /// recive Response
+                    str = response.readUTF();
+                    System.out.println(str);
+                    
+                    /// dirction of file
+                    str = scan.nextLine();
+                    /// Send file content to server
+                    request.writeUTF(postRequest(str));
+
+                    
+                }else{
                 /// recive Response
                 str = response.readUTF();
                 System.out.println(str);
@@ -51,7 +95,9 @@ public class Client {
                 /// Send Request
                 str = scan.nextLine();
                 request.writeUTF(str);
-         
+
+                }
+               
             }
 
             //// recive response from server

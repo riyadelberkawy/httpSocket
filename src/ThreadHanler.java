@@ -1,12 +1,13 @@
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.Date;
 import java.util.Scanner;
 
-import java.io.File;
-import java.io.FileWriter;
+
 
 
 public class ThreadHanler implements Runnable {
@@ -75,30 +76,28 @@ public class ThreadHanler implements Runnable {
     }    
 
     /// POST request Method
-    static Boolean postRequest(String host, String dir) {
+    static Boolean postRequest(String host, String content) {
 
-        System.out.println("Request received\nPOST/"+dir+" HTTP/1.1\nHost: " + host);
+        /// GET File Name
+        int newLineIndex = content.indexOf ("\n");
+        String fileName = content.substring (0, newLineIndex);
+
+        System.out.println("Request received\nPOST/"+fileName+" HTTP/1.1\nHost: " + host);
         
         try {
         
-            File file = new File(dir);
-            File postedFile = new File("static/"+host+"/"+file.getName());
-        
+            File postedFile = new File("static/"+host+"/"+fileName);
+            String fileContent = content.substring (newLineIndex + 1);
             if (!postedFile.exists()) {
                 postedFile.getParentFile().mkdirs();
                 if(postedFile.createNewFile()){
-                     ///// write contetn file into file that is on server
+                    ///// write contetn file into file that is on server
                     FileWriter writer = new FileWriter(postedFile.getAbsoluteFile());
-                    Scanner content = new Scanner(file);
-                    
+             
                     /// Write File content 
-                    while(content.hasNextLine()){
-                        String str = content.nextLine();
-                        writer.write(str+"\n");
-                    }
-        
+                    writer.write(fileContent);
+            
                     writer.close();
-                    content.close();
                 }
 
                 System.out.println("File created Successfully");
@@ -126,6 +125,7 @@ public class ThreadHanler implements Runnable {
             ///// 
             String host;
             String dir;
+            String fileContent = "";
             String str;
 
             ////// Hello message
@@ -160,8 +160,8 @@ public class ThreadHanler implements Runnable {
 
                             case "POST":
                                 response.writeUTF("Please Enter the Diraction of the required file: ");
-                                dir = request.readUTF();
-                                if(postRequest(host, dir)){
+                                fileContent = request.readUTF();
+                                if(postRequest(host,fileContent)){
                                     response.writeUTF("Request Accepted\nHTTP/1.1 200 OK" + "\n\nPress Enter to continue");
                                     request.readUTF();
                                 }else{
